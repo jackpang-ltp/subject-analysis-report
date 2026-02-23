@@ -245,9 +245,9 @@ def generate_report(df, filename, passing_mark):
 
         doc.add_page_break()
 
-        # --- Part 4: Mark Dist Table ---
+# --- Part 4: Mark Dist Table ---
         bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 101]
-        labels = [f"{i}-{i+10} (excluding {i+10})" for i in range(0, 90, 10)]
+        labels = [f"{i}-{i+10} (excluding {i+10})" for i in range(0, 100, 10)] # Changed 90 to 100
         labels[-1] = "90-100"
         
         sub_df['Range'] = pd.cut(sub_df['Mark'], bins=bins, labels=labels, right=False)

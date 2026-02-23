@@ -257,7 +257,8 @@ def generate_report(df, filename, passing_mark):
         doc.add_heading("3. Overall Mark Distribution", level=2)
         doc.add_paragraph("Boxplot of Subject Mark distribution.")
         doc.add_picture(create_chart_image(fig), width=Inches(6))
-
+        doc.add_page_break()
+        
         # --- Part 4: Mark Dist Table ---
         bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 101]
         labels = [f"{i}-{i+10} (excluding {i+10})" for i in range(0, 100, 10)] # Changed 90 to 100
@@ -307,20 +308,6 @@ def generate_report(df, filename, passing_mark):
                 row_cells[c+1].text = str(val)
 
         doc.add_page_break()
-
-        # --- Part 5: Grade Dist Chart ---
-        fig, ax = plt.subplots(figsize=(10, 6))
-        plot_data = dist_table.iloc[:-3].copy() # Exclude stats
-        plot_data.plot(kind='bar', width=0.8, colormap='Pastel1', edgecolor='black', alpha=0.8, ax=ax)
-        ax.set_title(f'Mark Distribution - {subject_name}')
-        ax.set_ylabel('Number of Students')
-        ax.set_xlabel('Mark Range')
-        ax.legend(title='Class/Group')
-        plt.tight_layout()
-
-        doc.add_heading("5. Mark Distribution Chart", level=2)
-        doc.add_paragraph("Chart presenting Mark Distribution.")
-        doc.add_picture(create_chart_image(fig), width=Inches(6))
 
     # Save to buffer
     doc_io = io.BytesIO()

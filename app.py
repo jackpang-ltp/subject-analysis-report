@@ -253,12 +253,12 @@ def generate_report(df, filename, passing_mark):
         ax.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
 
-        # --- THE MISSING LINES: Add the chart to the Word Document ---
+        # --- Add the chart to the Word Document ---
         doc.add_heading("3. Overall Mark Distribution", level=2)
         doc.add_paragraph("Boxplot of Subject Mark distribution.")
         doc.add_picture(create_chart_image(fig), width=Inches(6))
 
-# --- Part 4: Mark Dist Table ---
+        # --- Part 4: Mark Dist Table ---
         bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 101]
         labels = [f"{i}-{i+10} (excluding {i+10})" for i in range(0, 100, 10)] # Changed 90 to 100
         labels[-1] = "90-100"

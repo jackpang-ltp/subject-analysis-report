@@ -226,7 +226,7 @@ def generate_report(df, filename, passing_mark):
             for c, val in enumerate(data_row):
                 row_cells[c+1].text = f"{val:.1f}" if pd.notna(val) else "-"
 
-# --- Part 3: Boxplot ---
+        # --- Part 3: Boxplot ---
         fig, ax = plt.subplots(figsize=(10, 6))
         
         # 1. Create a clean DataFrame with just Group and Mark
@@ -252,6 +252,11 @@ def generate_report(df, filename, passing_mark):
         ax.set_xlabel('') # Clear x-axis label to keep it neat
         ax.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
+
+        # --- THE MISSING LINES: Add the chart to the Word Document ---
+        doc.add_heading("3. Overall Mark Distribution", level=2)
+        doc.add_paragraph("Boxplot of Subject Mark distribution.")
+        doc.add_picture(create_chart_image(fig), width=Inches(6))
 
 # --- Part 4: Mark Dist Table ---
         bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 101]

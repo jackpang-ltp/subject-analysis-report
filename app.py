@@ -226,24 +226,32 @@ def generate_report(df, filename, passing_mark):
             for c, val in enumerate(data_row):
                 row_cells[c+1].text = f"{val:.1f}" if pd.notna(val) else "-"
 
-        # --- Part 3: Boxplot ---
+# --- Part 3: Boxplot ---
         fig, ax = plt.subplots(figsize=(10, 6))
-        boxplot_data = [sub_df[sub_df['Group'] == grp]['Mark'].dropna() for grp in sorted_groups]
-        boxplot_data.append(sub_df['Mark'].dropna()) # Whole Form
-        boxplot_labels = sorted_groups + ['Whole Form']
         
-        sns.boxplot(data=boxplot_data, palette="Pastel1", ax=ax)
+        # 1. Create a clean DataFrame with just Group and Mark
+        plot_df = sub_df[['Group', 'Mark']].dropna().copy()
+        
+        # 2. Create a duplicate for the 'Whole Form'
+        whole_form_df = plot_df.copy()
+        whole_form_df['Group'] = 'Whole Form'
+        
+        # 3. Combine them together
+        combined_df = pd.concat([plot_df, whole_form_df])
+        
+        # 4. Enforce the exact sorting order for the X-axis
+        boxplot_labels = sorted_groups + ['Whole Form']
+        combined_df['Group'] = pd.Categorical(combined_df['Group'], categories=boxplot_labels, ordered=True)
+        
+        # 5. Plot using explicit x and y mappings
+        sns.boxplot(data=combined_df, x='Group', y='Mark', palette="Pastel1", ax=ax)
+        
         ax.set_xticklabels(boxplot_labels, rotation=45 if is_subject_group else 0)
         ax.set_title(f'Overall Mark Distribution - {subject_name}')
         ax.set_ylabel('Mark')
+        ax.set_xlabel('') # Clear x-axis label to keep it neat
         ax.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
-
-        doc.add_heading("3. Overall Mark Distribution", level=2)
-        doc.add_paragraph("Boxplot of Subject Mark distribution.")
-        doc.add_picture(create_chart_image(fig), width=Inches(6))
-
-        doc.add_page_break()
 
 # --- Part 4: Mark Dist Table ---
         bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 101]

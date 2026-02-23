@@ -328,19 +328,28 @@ if uploaded_file is not None:
     if st.button("Generate Report"):
         with st.spinner('Processing data and generating charts...'):
             try:
-                # Load Data
+               # Load Data
                 if uploaded_file.name.endswith('.csv'):
-                    # Try reading with skipping header if needed (detected from user files)
-                    # We try reading row 0, if 'Class' is not there, try header=1
-                    df_temp = pd.read_csv(uploaded_file, sep='\t')
+                    # Try reading with default UTF-8 first
+                    try:
+                        df_temp = pd.read_csv(uploaded_file, sep='\t', encoding='utf-8')
+                    except UnicodeDecodeError:
+                        # If it fails, fallback to UTF-16 (Common for Excel 'Unicode Text' exports)
+                        uploaded_file.seek(0)
+                        df_temp = pd.read_csv(uploaded_file, sep='\t', encoding='utf-16')
+
+                    # Check if we need to skip the first row (header=1)
                     if 'Class' not in df_temp.columns and 'Subject Block' not in df_temp.columns:
                          uploaded_file.seek(0)
-                         df = pd.read_csv(uploaded_file, sep='\t', header=1)
+                         try:
+                             df = pd.read_csv(uploaded_file, sep='\t', header=1, encoding='utf-8')
+                         except UnicodeDecodeError:
+                             uploaded_file.seek(0)
+                             df = pd.read_csv(uploaded_file, sep='\t', header=1, encoding='utf-16')
                     else:
                          df = df_temp
                 else:
                     df = pd.read_excel(uploaded_file)
-
                 # Generate
                 doc_file = generate_report(df, uploaded_file.name, passing_mark)
                 

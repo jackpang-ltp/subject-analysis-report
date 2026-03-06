@@ -75,10 +75,13 @@ def generate_report(df, filename, passing_mark):
     subjects = [c.replace(' [Attitude]', '') for c in attitude_cols]
     subjects = [s for s in subjects if s in df.columns]
 
-    if is_subject_group:
-        # Logic for S4-S5 Grouping
+if is_subject_group:
+        # Logic for S4-S6 Grouping
         df['Level'] = df['Subject Block'].apply(lambda x: str(x)[0] if pd.notna(x) else '')
-        df = df[df['Level'].isin(['4', '5'])] # Filter valid levels
+        
+        # ---> UPDATED: Added '6' to include S6 data <---
+        df = df[df['Level'].isin(['4', '5', '6'])] 
+        
         df['Level_Name'] = 'S' + df['Level']
         
         levels = sorted(df['Level_Name'].unique())
@@ -86,16 +89,19 @@ def generate_report(df, filename, passing_mark):
             for sub in subjects:
                 # Create a filtered dataframe for this unit
                 sub_df = df[df['Level_Name'] == lvl].copy()
-                cols = ['Subject Block', sub, f"{sub} [Attitude]"]
-                # Standardize columns
-                unit_data = sub_df[cols].copy()
-                unit_data.columns = ['Group', 'Mark', 'Attitude']
-                report_units.append({
-                    'title': f"{lvl} {sub}", 
-                    'subject': sub,
-                    'df': unit_data,
-                    'level': lvl
-                })
+                
+                # Make sure the subject actually exists for this level before creating a report unit
+                if sub in sub_df.columns and not sub_df[sub].isna().all():
+                    cols = ['Subject Block', sub, f"{sub} [Attitude]"]
+                    # Standardize columns
+                    unit_data = sub_df[cols].copy()
+                    unit_data.columns = ['Group', 'Mark', 'Attitude']
+                    report_units.append({
+                        'title': f"{lvl} {sub}", 
+                        'subject': sub,
+                        'df': unit_data,
+                        'level': lvl
+                    })
     else:
         # Logic for S1-S3 Standard Class
         # Guess level from filename or default to generic

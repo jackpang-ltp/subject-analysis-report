@@ -75,7 +75,7 @@ def generate_report(df, filename, passing_mark):
     subjects = [c.replace(' [Attitude]', '') for c in attitude_cols]
     subjects = [s for s in subjects if s in df.columns]
 
-if is_subject_group:
+    if is_subject_group:
         # Logic for S4-S6 Grouping
         df['Level'] = df['Subject Block'].apply(lambda x: str(x)[0] if pd.notna(x) else '')
         

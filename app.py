@@ -24,14 +24,23 @@ def clean_numeric(val):
     except ValueError:
         return np.nan
 
-def get_sorted_groups(unique_items):
-    # Sorts classes or subject blocks
-    # Priority order: S, M, A, R, T
-    order = {'S': 1, 'M': 2, 'A': 3, 'R': 4, 'T': 5}
+def get_sorted_groups(unique_items, level_str, is_subject_group):
+    # If we are grouping by Subject Blocks (S4-S5), simply sort alphabetically
+    if is_subject_group:
+        return sorted([str(x) for x in unique_items if pd.notna(x)])
+
+    # Define the class order based on the Form Level
+    level_str = str(level_str).upper()
+    if level_str in ['S1', 'S2', 'S3']:
+        order = {'S': 1, 'M': 2, 'A': 3, 'R': 4, 'T': 5} # Junior Form: SMART
+    elif level_str in ['S4', 'S5', 'S6']:
+        order = {'S': 1, 'T': 2, 'A': 3, 'R': 4}         # Senior Form: STAR
+    else:
+        order = {'S': 1, 'M': 2, 'A': 3, 'R': 4, 'T': 5} # Default fallback
     
     def sort_key(name):
         name = str(name)
-        # Find the first letter that matches S, M, A, R, T
+        # Look for the relevant class letters in the string
         match = re.search(r'[SMART]', name)
         if match:
             return order.get(match.group(0), 99)
@@ -125,8 +134,8 @@ def generate_report(df, filename, passing_mark):
         is_spanish = "Spanish" in subject_name
         is_restricted = is_enhancement and not is_spanish
 
-        # Get Sorted Groups (Classes or Blocks)
-        sorted_groups = get_sorted_groups(sub_df['Group'].unique())
+        # Get Sorted Groups (Context-aware for S1-S3 vs S4-S6)
+        sorted_groups = get_sorted_groups(sub_df['Group'].unique(), level, is_subject_group)
 
         # Start New Section in Word
         if i == 0:

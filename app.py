@@ -158,7 +158,7 @@ def generate_report(df, filename, passing_mark):
         header_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
         # Title
-        doc.add_heading(f"2526 Term 1 {report_title} Analysis Report", level=1)
+        doc.add_heading(f"2526 Term 2 {report_title} Analysis Report", level=1)
 
         # --- Part 1: Attitude ---
         att_df = sub_df[sub_df['Attitude'].isin(['A', 'B', 'C', 'D'])]
